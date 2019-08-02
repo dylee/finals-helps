@@ -216,7 +216,20 @@
     end
     ```
 
-12. Add icons via fontawesome; update vendor likes to icons; commit
+12. Add mail to vendor on comment create; commit
+
+    ```
+    rails generate mailer comments_mailer
+    ```
+
+    ```
+    def notify_vendor(vendor)
+      @vendor = vendor
+      mail to: @vendor.email, subject: "You received a comment!"
+    end
+    ```
+
+13. Add icons via fontawesome; update vendor likes to icons; commit
 
     ```
     <script src="https://kit.fontawesome.com/0d41050561.js"></script>
@@ -230,7 +243,7 @@
     <% end %>
     ```
 
-13. Deploy to Heroku; run data load
+14. Deploy to Heroku; run data load
 
     ```
     git push heroku master
