@@ -108,7 +108,7 @@
     ```
 
     ```
-    cache: Redis.new,
+    cache: Rails.env.development?? Redis.new : nil,
     ```
 
     ```
@@ -227,6 +227,10 @@
       @vendor = vendor
       mail to: @vendor.email, subject: "You received a comment!"
     end
+    ```
+
+    ```
+    CommentsMailer.notify_vendor(@comment.vendor).deliver_now if Rails.env.development?
     ```
 
 13. Add icons via fontawesome; update vendor likes to icons; commit
