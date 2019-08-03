@@ -9,10 +9,6 @@
 2. Create vendor scaffold; migrate; adjust index and edit; seeds.1.rb; faker; remove new vendor link on index; commit
 
     ```
-    rails g scaffold vendor name:string phone:string email:string website:string address:string description:string content:text
-    ```
-
-    ```
     cp ../helps/seeds.1.rb db/seeds.rb 
     ```
 
@@ -29,10 +25,6 @@
 4. Create school resource; nest routes; root route; add school_id to vendors; seeds.2.rb; adjust school index; redirect on show; adjust vendor controller to load @school and load vendors from @school; adjust vendor index/show/edit links; commit
 
     ```
-    rails g scaffold school name:string
-    ```
-
-    ```
     rails g migration add_school_id_to_vendor school_id:integer:index
     ```
 
@@ -41,42 +33,10 @@
     ```
 
     ```
-    redirect_to school_vendors_path(@school)
-    ```
-
-    ```
-    before_action :set_school, only: [:index]
-    ```
-
-    ```
     @school = School.find(params[:school_id]) if params[:school_id] 
     ```
 
-    ```
-    @vendors = @school.vendors
-    ```
-
-    ```
-    <%= link_to 'Back', school_vendors_path(@school) %>
-    ```
-
-    ```
-    <%= link_to 'Vendors', school_vendors_path(@vendor.school) %>
-    ```
-
-    ```
-    <%= link_to 'School', schools_path %>
-    ```
-
 4. Add comment feature via scaffold; add association to vendor and comment; add index and form to vendor show; redirect create comment to vendor; hide vendor_id on form; commit
-
-    ```
-    rails g scaffold comment like:boolean content:string vendor_id:integer:index
-    ```
-
-    ```
-    <% @vendor.comments.each do |comment| %>
-    ```
 
     ```
     <%= render "comments/form", comment: @vendor.comments.new %>
@@ -108,7 +68,7 @@
     ```
 
     ```
-    cache: Rails.env.development?? Redis.new : nil,
+    cache: Rails.env.production?? nil: Redis.new,
     ```
 
     ```
@@ -135,10 +95,6 @@
     <input name="location" value="<%= params[:location] %>" placeholder="locat
     ```
 
-    ```
-    @vendors = @vendors.near(params[:location], 100) if params[:location].present?
-    ```
-
 9. Add authentication via devise; setup config; update development.rb; generate user; add login links on top of page via application.html with a partial in app/views/application dir; separate flash messages into a partial in same dir; remove doubled flash messages from scaffold views; commit
 
     ```
@@ -151,10 +107,6 @@
 
     ```
     rails generate devise user
-    ```
-
-    ```
-    <%= render "messages" %>
     ```
 
     ```
@@ -173,16 +125,16 @@
     ```
 
     ```
+    <%= render "messages" %>
+    ```
+
+    ```
     <% flash.each do |type, msg| %>
       <p><%= msg %></p>
     <% end %>
     ```
 
 10. Add claim vendor feature; add user_id to vendor and add association on model; add claim action on vendor controller; add claim action on routes; add claim button; commit
-
-    ```
-    rails g migration add_user_id_to_vendor user_id:integer:index
-    ```
 
     ```
     def claim
@@ -216,11 +168,7 @@
     end
     ```
 
-12. Add mail to vendor on comment create; commit
-
-    ```
-    rails generate mailer comments_mailer
-    ```
+12. Add mail to vendor on comment create; use letter_opener gem for mailbox for all environments (not for development env only!); add route for mailbox to view email; commit
 
     ```
     def notify_vendor(vendor)
@@ -230,7 +178,15 @@
     ```
 
     ```
-    CommentsMailer.notify_vendor(@comment.vendor).deliver_now if Rails.env.development?
+    CommentsMailer.notify_vendor(@comment.vendor).deliver_now 
+    ```
+
+    ```
+    gem 'letter_opener'
+    ```
+
+    ```
+    mount LetterOpenerWeb::Engine, at: "/mailbox"
     ```
 
 13. Add icons via fontawesome; update vendor likes to icons; commit
@@ -240,14 +196,15 @@
     ```
 
     ```
-    <% if comment.like %>
-      <i class="fa fa-heart" style="color:red;"></i>
-    <% else %>
-      <i class="fa fa-heart-broken" style="color:#ccc;"></i>
-    <% end %>
+    <i class="fa fa-heart"></i>
+    <i class="fa fa-heart-broken"></i>
     ```
 
-14. Deploy to Heroku; run data load
+14. Deploy to Heroku; create a new app on heroku (delete the old app); setup heroku remote; enable metadata on heroku (see instructions below for labs:enable); run data load
+
+    ```
+    heroku git:remote -a [name-of-your-heroku-app]
+    ```
 
     ```
     git push heroku master
@@ -259,5 +216,9 @@
 
     ```
     heroku run rake db:data:load
+    ```
+
+    ```
+    heroku labs:enable runtime-dyno-metadata -a [name-of-your-heroku-app]
     ```
 
