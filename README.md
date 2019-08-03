@@ -168,7 +168,7 @@
     end
     ```
 
-12. Add mail to vendor on comment create; use letter_opener gem for mailbox for all environments (not for development env only!); add route for mailbox to view email; commit
+12. Add mail to vendor on comment create; use letter_opener gem for mailbox for all environments (not for development env only!); add action_mailer configuration in config/environments/development.rb; add route for mailbox to view email; commit
 
     ```
     def notify_vendor(vendor)
@@ -182,7 +182,12 @@
     ```
 
     ```
-    gem 'letter_opener'
+    gem 'letter_opener_web'
+    ```
+
+    ```
+    config.action_mailer.delivery_method = :letter_opener_web
+    config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
     ```
 
     ```
@@ -200,7 +205,12 @@
     <i class="fa fa-heart-broken"></i>
     ```
 
-14. Deploy to Heroku; create a new app on heroku (delete the old app); setup heroku remote; enable metadata on heroku (see instructions below for labs:enable); run data load
+14. Deploy to Heroku; setup production for letter_opener; add action_mailer configuration in config/environments/production.rb; create a new app on heroku (delete the old app); setup heroku remote; enable metadata on heroku (see instructions below for labs:enable); run data load
+
+    ```
+    config.action_mailer.delivery_method = :letter_opener_web
+    config.action_mailer.default_url_options = { host: "#{ENV['HEROKU_APP_NAME']}.herokuapp.com" }
+    ```
 
     ```
     heroku git:remote -a [name-of-your-heroku-app]
